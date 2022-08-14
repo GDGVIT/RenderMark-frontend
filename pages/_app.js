@@ -6,6 +6,7 @@ import Navbar from '../components/Navbar/Navbar'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import Footer from '../components/Footer/Footer'
 
 const queryClient = new QueryClient()
 function MyApp ({ Component, pageProps }) {
@@ -56,6 +57,13 @@ function MyApp ({ Component, pageProps }) {
             <Link href={`/status/${currentVideo}`}>Video Render Status</Link>
           </div>
       )}
+      <Footer
+        color={
+          router.pathname === '/templates' || router.pathname.includes('/edit')
+            ? 'black'
+            : 'white'
+        }
+      />
     </QueryClientProvider>
   )
 }
