@@ -10,7 +10,7 @@ export default function Upload () {
   const { id } = router.query
   const [file, setFile] = useState(null)
   const [fileText, setFileText] = useState('')
-  const [json, setJson] = useState({})
+  const [setJson] = useState({})
   const [parseDone, setParseDone] = useState(false)
 
   useEffect(() => {

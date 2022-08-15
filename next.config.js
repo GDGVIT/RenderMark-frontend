@@ -1,7 +1,7 @@
-const removeImports = require("next-remove-imports")();
-const withBundleAnalyzer = require("@next/bundle-analyzer")({
-  enabled: process.env.ANALYZE === "true",
-});
+const removeImports = require('next-remove-imports')()
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true'
+})
 
 module.exports = (_phase, { defaultConfig }) => {
   return withBundleAnalyzer(
@@ -9,8 +9,8 @@ module.exports = (_phase, { defaultConfig }) => {
       ...defaultConfig,
 
       images: {
-        domains: ["images.unsplash.com", "res.cloudinary.com"],
-      },
+        domains: ['images.unsplash.com', 'res.cloudinary.com']
+      }
     })
-  );
-};
+  )
+}
