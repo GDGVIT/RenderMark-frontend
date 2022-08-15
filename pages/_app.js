@@ -57,13 +57,7 @@ function MyApp ({ Component, pageProps }) {
             <Link href={`/status/${currentVideo}`}>Video Render Status</Link>
           </div>
       )}
-      <Footer
-        color={
-          router.pathname === '/templates' || router.pathname.includes('/edit')
-            ? 'black'
-            : 'white'
-        }
-      />
+      {router.pathname === '/' && <Footer color='white' />}
     </QueryClientProvider>
   )
 }

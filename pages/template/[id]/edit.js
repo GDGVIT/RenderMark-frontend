@@ -67,7 +67,12 @@ export default function EditMarkdownForTemplate () {
   const [parseDone, setParseDone] = useState(false)
   const isMobile = useMediaQuery('(max-width:756px)')
   const [value, setValue] = useState(initialMD)
-  const [showPreview, setShowPreview] = useState(!isMobile)
+  const [previewMode, setPreviewMode] = useState('live')
+
+  useEffect(() => {
+    if (isMobile) setPreviewMode('edit')
+  }, [isMobile])
+
   const insertAtPosition = (text) => {
     const textarea = document.getElementsByClassName(
       'w-md-editor-text-input'
@@ -115,7 +120,8 @@ export default function EditMarkdownForTemplate () {
   }
 
   const togglePreview = () => {
-    setShowPreview(!showPreview)
+    if (previewMode === 'edit') setPreviewMode('preview')
+    else setPreviewMode('edit')
   }
   const showJson = (value) => {
     try {
@@ -275,21 +281,22 @@ export default function EditMarkdownForTemplate () {
                 <div className={styles.circle + ' ' + styles.yellow} />
                 <div className={styles.circle + ' ' + styles.green} />
               </div>
-              {isMobile && (
-                <button
-                  onClick={() => {
-                    togglePreview()
-                  }}
-                  className={styles.previewbutton}
-                >
-                  {showPreview ? 'Editor' : 'Preview'}
-                </button>
-              )}
+              <button
+                style={{
+                  visibility: previewMode === 'live' ? 'hidden' : 'visible'
+                }}
+                onClick={() => {
+                  togglePreview()
+                }}
+                className={styles.previewbutton}
+              >
+                {previewMode === 'edit' ? 'Preview' : 'Editor'}
+              </button>
             </div>
             <MDEditor
               hideToolbar
               onPaste={pasteHandler}
-              preview={showPreview ? (isMobile ? 'preview' : 'live') : 'edit'}
+              preview={previewMode}
               height={560}
               enableScroll
               visiableDragbar={false}
