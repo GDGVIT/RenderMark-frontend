@@ -15,6 +15,7 @@ import Image from 'next/image'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import Head from 'next/head'
+import useMediaQuery from '../../../hooks/useMediaQuery'
 const MDEditor = dynamic(
   () => import('@uiw/react-md-editor').then((mod) => mod.default),
   { ssr: false }
@@ -61,11 +62,16 @@ export default function EditMarkdownForTemplate () {
   const apiUrl = process.env.NEXT_PUBLIC_PROD_API_URL
   const router = useRouter()
   const { id } = router.query
-  const [showPreview] = useState(true)
+
   const [json, setJson] = useState({})
   const [parseDone, setParseDone] = useState(false)
-
+  const isMobile = useMediaQuery('(max-width:756px)')
   const [value, setValue] = useState(initialMD)
+  const [previewMode, setPreviewMode] = useState('live')
+
+  useEffect(() => {
+    if (isMobile) setPreviewMode('edit')
+  }, [isMobile])
 
   const insertAtPosition = (text) => {
     const textarea = document.getElementsByClassName(
@@ -83,7 +89,7 @@ export default function EditMarkdownForTemplate () {
   const pasteHandler = (e) => {
     for (const element of e.clipboardData.items) {
       const item = element
-      console.log(item.type)
+      // console.log(item.type)
       if (item.type.indexOf('image') !== -1) {
         const blob = item.getAsFile()
 
@@ -101,7 +107,7 @@ export default function EditMarkdownForTemplate () {
       }
 
       if (xhr.status === 200) {
-        console.log('SUCCESS', xhr.responseText)
+        // console.log('SUCCESS', xhr.responseText)
         insertAtPosition(xhr.responseText)
       } else {
         console.warn('request_error')
@@ -113,13 +119,14 @@ export default function EditMarkdownForTemplate () {
     xhr.send(blob)
   }
 
-  // const togglePreview = useCallback(() => {
-  //   setShowPreview(!showPreview)
-  // }, [showPreview])
+  const togglePreview = () => {
+    if (previewMode === 'edit') setPreviewMode('preview')
+    else setPreviewMode('edit')
+  }
   const showJson = (value) => {
     try {
       const html = marked.parse(value)
-      console.log(html)
+      // console.log(html)
       const dom = parse(html)
       let title = null
       try {
@@ -135,7 +142,7 @@ export default function EditMarkdownForTemplate () {
         const textContent = ele.textContent.trimEnd()
         if (textContent.includes('Scene') || textContent.includes('scene')) {
           const splitText = textContent.split(' ')
-          console.log(splitText)
+          // console.log(splitText)
           if (
             splitText.length !== 2 ||
             !splitText[1].endsWith(':') ||
@@ -174,7 +181,7 @@ export default function EditMarkdownForTemplate () {
               )
             }
             img = nextChild.firstChild.getAttribute('src')
-            console.log(index)
+            // console.log(index)
             nextChild = nextChild.nextElementSibling
           } else img = ''
           if (index !== 1 && index !== 3) {
@@ -231,7 +238,7 @@ export default function EditMarkdownForTemplate () {
     }
     if (parseDone === true) {
       const toastid = toast.loading('Loading')
-      console.log(json)
+      // console.log(json)
       renderVideo(toastid)
     }
   }, [parseDone, json, router])
@@ -269,14 +276,27 @@ export default function EditMarkdownForTemplate () {
             {showPreview ? "Editor" : "Preview"}
           </Button> */}
             <div className={styles.toolbar}>
-              <div className={styles.circle + ' ' + styles.red} />
-              <div className={styles.circle + ' ' + styles.yellow} />
-              <div className={styles.circle + ' ' + styles.green} />
+              <div className={styles.circles}>
+                <div className={styles.circle + ' ' + styles.red} />
+                <div className={styles.circle + ' ' + styles.yellow} />
+                <div className={styles.circle + ' ' + styles.green} />
+              </div>
+              <button
+                style={{
+                  visibility: previewMode === 'live' ? 'hidden' : 'visible'
+                }}
+                onClick={() => {
+                  togglePreview()
+                }}
+                className={styles.previewbutton}
+              >
+                {previewMode === 'edit' ? 'Preview' : 'Editor'}
+              </button>
             </div>
             <MDEditor
               hideToolbar
               onPaste={pasteHandler}
-              preview={showPreview ? 'live' : 'edit'}
+              preview={previewMode}
               height={560}
               enableScroll
               visiableDragbar={false}
